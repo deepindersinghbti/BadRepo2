@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Insecure Data Collection Demo</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 480px; margin: 60px auto; background: #f5f5f5; }
+    h1 { color: #c0392b; }
+    .warning { background: #ffe0e0; border: 2px solid #c0392b; padding: 10px; margin-bottom: 20px; border-radius: 4px; }
+    form { background: white; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    label { display: block; margin-top: 14px; font-weight: bold; }
+    input { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+    button { margin-top: 20px; width: 100%; padding: 10px; background: #c0392b; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
+    button:hover { background: #a93226; }
+    #result { margin-top: 16px; color: green; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>⚠️ Insecure Demo — Do NOT Use in Production</h1>
+  <div class="warning">
+    <strong>WARNING:</strong> This page intentionally demonstrates insecure practices.
+    Data is sent over plain HTTP and stored in a plain-text file with no encryption or access control.
+  </div>
+
+  <form id="dataForm">
+    <label for="name">Full Name</label>
+    <input type="text" id="name" name="name" placeholder="John Doe" required />
+
+    <label for="email">Email Address</label>
+    <input type="email" id="email" name="email" placeholder="john@example.com" required />
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" placeholder="supersecret" required />
+
+    <label for="phone">Phone Number</label>
+    <input type="text" id="phone" name="phone" placeholder="+1 555-0100" />
+
+    <label for="dob">Date of Birth</label>
+    <input type="date" id="dob" name="dob" />
+
+    <label for="ssn">SSN (last 4 digits)</label>
+    <input type="tel" id="ssn" name="ssn" placeholder="1234" maxlength="4" inputmode="numeric" />
+
+    <button type="submit">Submit</button>
+    <div id="result"></div>
+  </form>
+
+  <script>
+    document.getElementById('dataForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const data = {
+        name:     document.getElementById('name').value,
+        email:    document.getElementById('email').value,
+        password: document.getElementById('password').value,
+        phone:    document.getElementById('phone').value,
+        dob:      document.getElementById('dob').value,
+        ssn:      document.getElementById('ssn').value
+      };
+
+      const resp = await fetch('/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const resultEl = document.getElementById('result');
+      if (resp.ok) {
+        resultEl.textContent = '✓ Data submitted (and insecurely stored in data.txt)';
+      } else {
+        resultEl.style.color = 'red';
+        resultEl.textContent = '✗ Error submitting data.';
+      }
+    });
+  </script>
+</body>
+</html>
